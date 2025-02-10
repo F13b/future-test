@@ -1,5 +1,7 @@
 import { FC } from "react";
 import { IRepo } from "../types";
+import { Card, Heading, Link, Text } from "@chakra-ui/react";
+import { LuExternalLink } from "react-icons/lu";
 
 type RepoCardProps = {
   repo: IRepo;
@@ -7,17 +9,24 @@ type RepoCardProps = {
 
 const RepoCard: FC<RepoCardProps> = ({ repo }) => {
   return (
-    <div className="border border-black">
-      <p>{repo.name}</p>
-      <p>{repo.description}</p>
-      <div>
-        <span>{repo.stargazers_count}⭐</span>
-        <span>Last update at {repo.updated_at}</span>
-        <a href={repo.html_url} target="_blank">
-          Go to repo
-        </a>
-      </div>
-    </div>
+    <Card.Root>
+      <Card.Header>
+        <Heading>{repo.name}</Heading>
+        <Text>{repo.stargazers_count} ⭐</Text>
+      </Card.Header>
+      <Card.Body>{repo.description}</Card.Body>
+      <Card.Footer justifyContent="flex-end">
+        <span>{repo.updated_at}</span>
+        <Link
+          href={repo.html_url}
+          variant="plain"
+          colorPalette={"teal"}
+          target="_blank"
+        >
+          Go to repo <LuExternalLink />
+        </Link>
+      </Card.Footer>
+    </Card.Root>
   );
 };
 

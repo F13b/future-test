@@ -30,7 +30,8 @@ function App() {
   const fetchRepos = async () => {
     setLoading(true);
     const { data } = await octokit.request(`GET /users/${search}/repos`, {
-      username: "USERNAME",
+      owner: { search },
+      per_page: 20,
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
       },
