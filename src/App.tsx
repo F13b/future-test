@@ -1,10 +1,9 @@
 import { Octokit } from "octokit";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import RepoCard from "./components/RepoCard";
 import { IRepo } from "./types";
 import {
   Box,
-  Button,
   Flex,
   Heading,
   HStack,
@@ -13,11 +12,30 @@ import {
   Spinner,
   Theme,
 } from "@chakra-ui/react";
+import {
+  PaginationItems,
+  PaginationNextTrigger,
+  PaginationPrevTrigger,
+  PaginationRoot,
+} from "./components/ui/pagination";
 
 function App() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [repos, setRepos] = useState<IRepo[]>([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (search !== "") fetchRepos();
+      else {
+        setRepos([]);
+      }
+    }, 3000);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [search]);
 
   const octokit = new Octokit({
     auth: import.meta.env.VITE_GITHUB_KEY,
@@ -40,6 +58,11 @@ function App() {
     setLoading(false);
   };
 
+  const startRange = (page - 1) * pageSize;
+  const endRange = startRange + pageSize;
+
+  const visibleItems = repos.slice(startRange, endRange);
+
   return (
     <Theme appearance="light">
       <header>
@@ -54,9 +77,6 @@ function App() {
             value={search}
             onChange={handleSearch}
           />
-          <Button onClick={fetchRepos} colorPalette={"teal"}>
-            Search
-          </Button>
         </HStack>
         <Box mt={"3rem"}>
           {loading ? (
@@ -64,11 +84,31 @@ function App() {
               <Spinner />
             </Flex>
           ) : (
-            <SimpleGrid columns={[2, null, 3]} gap="20px">
-              {repos.map((repo) => (
-                <RepoCard key={repo.id} repo={repo} />
-              ))}
-            </SimpleGrid>
+            <>
+              <SimpleGrid columns={[2, null, 3]} gap="20px">
+                {visibleItems.map((repo) => (
+                  <RepoCard key={repo.id} repo={repo} />
+                ))}
+              </SimpleGrid>
+              {visibleItems.length != 0 ? (
+                <Flex justify={"center"} mt={"3rem"}>
+                  <PaginationRoot
+                    page={page}
+                    count={repos.length}
+                    pageSize={pageSize}
+                    onPageChange={(e) => setPage(e.page)}
+                  >
+                    <HStack>
+                      <PaginationPrevTrigger />
+                      <PaginationItems />
+                      <PaginationNextTrigger />
+                    </HStack>
+                  </PaginationRoot>
+                </Flex>
+              ) : (
+                <></>
+              )}
+            </>
           )}
         </Box>
       </Box>
