@@ -1,50 +1,38 @@
-# React + TypeScript + Vite
+# Тестовое задание Future
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Небольшое SPA приложение для поиска пользовательских репозиториев GitHub.
 
-Currently, two official plugins are available:
+## Описание задачи
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Создать приложение, которое будет получать список репозиториев по имени пользователя Github.
+Выводить список репозиториев на странице с краткой информацией о нём.
 
-## Expanding the ESLint configuration
+Подробнее с описанием задачи можно ознакомиться по [ссылке](https://github.com/fugr-ru/frontend-javascript-test-2).
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Установка и запуск
 
-- Configure the top-level `parserOptions` property like this:
+1. Необходимо клонировать репозиторий по ссылке с помощью консольной команды
+ ```git clone https://github.com/F13b/future-test.git``` либо через другой, удобный для вас способ.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+2. Перейти в клонированный репозиторий
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+``` cd future-test ```
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+3. Устновка зависимостей
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+``` npm i ``` или ``` npm install ```
+
+4. Запуск проекта
+
+``` npm run dev ```
+
+После 4 шага в консоли появится ссылка на локальный хост, открыв её в браузере откроется само приложение.
+
+Проект также развёрнут на Vercel и доступен по [ссылке](https://future-test-gilt.vercel.app/).
+
+## P.S.
+
+В проекте использована UI библиотека [ChakraUI](https://www.chakra-ui.com/) для более эстетичного внешнего вида компонентов, а также для усорения процесса разработки, чтобы не тратить временной ресурс на создание стилей компонентов.
+
+### Почему ChakraUI
+Данная библиотека компонентов имеет более минималистичный и современный внешний вид, нежели популярная MUI, которая всё ещё использует старый внешний вид Android приложений (даже Google уже перешли на новую дизайн концепцию Material You).
