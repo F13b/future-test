@@ -1,7 +1,6 @@
 import { Octokit } from "octokit";
 import { ChangeEvent, useEffect, useState } from "react";
 import RepoCard from "./components/RepoCard";
-import { IRepo } from "./types";
 import {
   Box,
   Flex,
@@ -18,19 +17,24 @@ import {
   PaginationPrevTrigger,
   PaginationRoot,
 } from "./components/ui/pagination";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { clearRepos, setLoading, setRepos, setSearch } from "./store/repoSlice";
+import { toaster, Toaster } from "./components/ui/toaster";
 
 function App() {
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [repos, setRepos] = useState<IRepo[]>([]);
   const [page, setPage] = useState(1);
-  const pageSize = 6;
+
+  const repos = useAppSelector((state) => state.repo.repos);
+  const loading = useAppSelector((state) => state.repo.loading);
+  const search = useAppSelector((state) => state.repo.search);
+  const pageSize = useAppSelector((state) => state.repo.itemsPerPage);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (search !== "") fetchRepos();
       else {
-        setRepos([]);
+        dispatch(clearRepos());
       }
     }, 3000);
 
@@ -42,20 +46,32 @@ function App() {
   });
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+    dispatch(setSearch(event.target.value));
   };
 
   const fetchRepos = async () => {
-    setLoading(true);
-    const { data } = await octokit.request(`GET /users/${search}/repos`, {
-      owner: { search },
-      per_page: 20,
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    });
-    setRepos(data);
-    setLoading(false);
+    dispatch(setLoading(true));
+    try {
+      const { data } = await octokit.request(`GET /users/${search}/repos`, {
+        owner: { search },
+        per_page: 20,
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      });
+      dispatch(setRepos(data));
+      dispatch(setLoading(false));
+    } catch (error) {
+      if (error instanceof Error) {
+        toaster.create({
+          title: "Error",
+          description: "User not found",
+          type: "error",
+          duration: 6000,
+        });
+        dispatch(setLoading(false));
+      }
+    }
   };
 
   const startRange = (page - 1) * pageSize;
@@ -65,11 +81,9 @@ function App() {
 
   return (
     <Theme appearance="light">
-      <header>
-        <Heading size={"4xl"} m={"10px"}>
-          GitHub API App
-        </Heading>
-      </header>
+      <Box m={"10px"}>
+        <Heading size={"4xl"}>GitHub API App</Heading>
+      </Box>
       <Box m={"3rem 3rem"}>
         <HStack>
           <Input
@@ -85,7 +99,10 @@ function App() {
             </Flex>
           ) : (
             <>
-              <SimpleGrid columns={[2, null, 3]} gap="20px">
+              <SimpleGrid
+                columns={{ base: 1, md: 2, xl: 3, "2xl": 4 }}
+                gap={{ base: "24px", md: "40px" }}
+              >
                 {visibleItems.map((repo) => (
                   <RepoCard key={repo.id} repo={repo} />
                 ))}
@@ -111,6 +128,7 @@ function App() {
             </>
           )}
         </Box>
+        <Toaster />
       </Box>
     </Theme>
   );
